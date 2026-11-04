@@ -100,6 +100,47 @@ def gradient_descent(X, y, learning_rate=0.01, num_iters=2000, tol=1e-8, verbose
             print(f"Iteration {i:4d}, Cost: {cost:.6f}")
 
     return theta, J_history
+alpha = 0.01
+theta, J_hist = gradient_descent(X, y, learning_rate=alpha, num_iters=5000, tol=1e-9, verbose=True)
+
+print("\nLearned Parameters (Theta):")
+print(theta.flatten())
+
+plt.figure(figsize=(7,4))
+plt.plot(J_hist)
+plt.xlabel('Iterations')
+plt.ylabel('Cost (MSE/2)')
+plt.title('Cost Function Convergence')
+plt.grid(True)
+plt.show()
+
+# Create new sample (same feature names as original)
+new_sample = pd.DataFrame([{
+    'R&D Spend': 165349.2,
+    'Administration': 136897.8,
+    'Marketing Spend': 471784.1,
+    'State': 'New York'
+}])
+
+# Apply one-hot encoding
+new_encoded = pd.get_dummies(new_sample, columns=['State'], drop_first=True)
+
+# Align columns with training data (add missing ones as 0)
+new_encoded = new_encoded.reindex(columns=data_encoded.drop('Profit', axis=1).columns, fill_value=0)
+
+# Scale new data
+new_scaled = X_scaler.transform(new_encoded)
+
+# Add bias
+new_design = np.hstack((np.ones((new_scaled.shape[0], 1)), new_scaled))
+
+# Predict (scaled)
+scaled_pred = new_design.dot(theta)
+
+# Inverse transform to original units
+pred_original = y_scaler.inverse_transform(scaled_pred)
+
+print(f"\nPredicted Profit for the new startup: ₹{pred_original[0][0]:,.2f}")
 ```
 
 ## Output:
@@ -107,6 +148,12 @@ def gradient_descent(X, y, learning_rate=0.01, num_iters=2000, tol=1e-8, verbose
 <img width="853" height="257" alt="Screenshot 2026-11-04 141135" src="https://github.com/user-attachments/assets/cfdaa4d4-be95-472f-b688-cb2a50cf8b9f" />
 <img width="281" height="50" alt="Screenshot 2026-11-04 141140" src="https://github.com/user-attachments/assets/4af44707-de01-462a-a184-d2c2235580ba" />
 <img width="427" height="35" alt="Screenshot 2026-11-04 141146" src="https://github.com/user-attachments/assets/d55ea32f-d70a-4d7d-8d13-da76c2af0c42" />
+<img width="633" height="327" alt="Screenshot 2026-11-04 142423" src="https://github.com/user-attachments/assets/2568e861-fc86-4328-8526-6fcbda1bfdb5" />
+<img width="786" height="502" alt="Screenshot 2026-11-04 142431" src="https://github.com/user-attachments/assets/5672fb3f-754a-4622-ae61-040642069ba4" />
+<img width="1551" height="75" alt="Screenshot 2026-11-04 142438" src="https://github.com/user-attachments/assets/a7b5dcc0-c45a-460d-bc5b-a5f50f8361a0" />
+
+
+
 
 
 ## Result:
